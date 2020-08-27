@@ -6,20 +6,30 @@ GIT_SHA=$(shell git rev-parse HEAD)
 ifndef VERBOSE
 	DOCKER_BUILD_ARGS=--quiet
 endif
+ifdef FORECAST_EPOCH_TIMESTAMP
+	FORECAST_CLI_ARGS=--forecast-epoch-timestamp=$(FORECAST_EPOCH_TIMESTAMP)
+endif
 
 UPSTREAM_REPO_ZIP = moon-data-master.zip
 RAW_DATA_CSV = lunations.csv.gz
 LIBRARY_DATA_JSON = lunations.json.gz
 
 
-$(LIBRARY_DATA_JSON): run $(RAW_DATA_CSV)
+forecast: run
+	@docker exec \
+		$(DOCKER_TAG) \
+		/code/venv/bin/python -m $(MODULE_NAME) forecast \
+		$(FORECAST_CLI_ARGS)
+
+
+./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV) run
 	@docker cp \
-		$(RAW_DATA_CSV) \
+		$< \
 		$(DOCKER_TAG):/code/
 	@docker exec \
 		$(DOCKER_TAG) \
-		/code/venv/bin/python -m $(MODULE_NAME) \
-		--path-to-csv-input=/code/$(RAW_DATA_CSV) \
+		/code/venv/bin/python -m $(MODULE_NAME) model \
+		--path-to-csv-input=/code/$< \
 		--path-to-json-output=/code/$(LIBRARY_DATA_JSON)
 	@docker cp \
 		$(DOCKER_TAG):/code/$(LIBRARY_DATA_JSON) \

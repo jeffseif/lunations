@@ -1,9 +1,3 @@
-- Lookup
-  - Are phases equally spaced out?
-  - Figure out illumination fraction equation
-  - Tabulate names of full moons
-  - `now() -> nearest, +1, -1 phases, % illumination`
-  - Encapsulate ^^ in CLI (w/ non-now date CLI option)
 - Package
   - Put all this in a package with no lib dependencies
 - Documentation

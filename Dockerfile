@@ -43,6 +43,7 @@ ENV     GIT_SHA=${GIT_SHA}
 
 WORKDIR /code
 COPY    lunations/ lunations/
+COPY    dat/ dat/
 
 # Run
 
