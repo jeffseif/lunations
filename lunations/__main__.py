@@ -22,7 +22,7 @@ def main():
 
     forecast_parser = subparsers.add_parser('forecast', help='Lookup lunations')
     forecast_parser.add_argument('--forecast-epoch-timestamp', default=datetime.datetime.now().timestamp(), type=float)
-    forecast_parser.set_defaults(func=forecaster.lookup)
+    forecast_parser.set_defaults(func=forecaster.cli)
 
     args = parser.parse_args()
     args.func(args)

@@ -53,3 +53,67 @@ The primary and secondary harmonics appear to span the period of the cycle of [t
 ## How good is the forecast?
 
 The model is fitted on 3966 historical lunations from `1700-01-20` through `2020-08-19` and presents a mean absolute error of `6 hours` and a bias of `-8 seconds`.  When evaluated on 763 lunations in the future (and not within the training set) through `2082-04-28`, it presents a mean absolute error of `5.3 hours` and a bias of `-108 seconds`.  For example, the first new moon in June 2030 occurs at `6:21 AM` and our model predicts that it will occur at `4:39 AM`, which is an error of around two hours.
+
+## How does the library work?
+
+### Using it as a python package
+
+1. Install the package: `pip install git://github.com/jeffseif/lunations.git#egg=lunations`
+1. Import it: `import lunations.forecaster`
+1. Run it `lunations.forecaster.forecast_for_current_timestamp()`
+
+### Doing one-shot forecasting
+
+```bash
+> make forecast
+# Build a fresh image
+sha256:26d6bb109d35971879578e17afcf68bc769824041655cc2d20d85aaaaafbc693
+# Stop and remove container
+# Run a fresh container
+d27e85d967855b712349cd49d014bf047cbe4bac4ef1a683864e2e2792bf8347
+{'current_timestamp': datetime.datetime(2020, 8, 28, 22, 0, 35, 349153), 'next_new_moon': datetime.datetime(2020, 9, 17, 11, 20, 20, 984441), 'previous_new_moon': datetime.datetime(2020, 8, 19, 0, 3, 45, 487658), 'nearest_full_moon': datetime.datetime(2020, 9, 2, 17, 42, 3, 236050), 'is_blue_moon': False, 'nearest_full_moon_name': 'Corn Moon', 'phase_fraction': 0.336427372751769, 'illumination_fraction': 0.7583701801043545, 'current_phase': 'Waxing Gibbous', 'next_phase': 'Waning Gibbous', 'previous_phase': 'Waxing Crescent'}
+```
+
+### Retraining the model
+
+```bash
+> make retrain
+# Build a fresh image
+sha256:a9b22c80631ff15060477b01e82529bb838890ea6da1b641c55c6435d0ae472d
+# Stop and remove container
+# Run a fresh container
+2f77a8630c0caaf550e8c67443f9a2707fe3c7dc7efff2a474fa18472e5cd80b
+> Loading data from /code/lunations.csv.gz
+> Extracted 4729 new moons
+> Splitting test/train data into 3966/763
+> Linear model
+
+Offset = 1700-01-20 02:45:36.078370
+Period = 29.531 days
+
+> Compressed harmonic model
+
+#0 = 3.52 hours at 13.95 lunations
+#1 = 1.66 hours at 12.36 lunations
+
+> Validation report: in sample
+
+- Evaluating 3966 lunations
+- Between 1700-01-20 04:20:00 and 2020-08-19 02:42:00
+- MAE: 6.0h
+- bias: -8s
+
+> Validation report: out of sample
+
+- Evaluating 763 lunations
+- Between 2020-09-17 11:00:00 and 2082-04-28 02:03:00
+- MAE: 5.3h
+- bias: -108s
+
+> Sampling lunation 4086
+
+- Predicted: 2030-06-01 04:38:59.891833
+- Observed : 2030-06-01 06:21:00
+
+> Exporting 123672 lunations to /code/lunations.json.gz
+```

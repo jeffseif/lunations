@@ -1,4 +1,0 @@
-- Package
-  - Put all this in a package with no lib dependencies
-- Documentation
-  - Example invocation and result

@@ -120,8 +120,14 @@ class Forecast:
                 return previous_phase
 
 
-def lookup(args):
-    print(dataclasses.asdict(Forecast.from_path_to_json(
-        current_timestamp=args.forecast_epoch_timestamp,
-        path_to_json=PATH_TO_LUNATIONS_DATA_JSON
-    )))
+def forecast_for_current_timestamp(
+    current_timestamp=datetime.datetime.now().timestamp()
+):
+    return dataclasses.asdict(Forecast.from_path_to_json(
+        current_timestamp=current_timestamp,
+        path_to_json=PATH_TO_LUNATIONS_DATA_JSON,
+    ))
+
+
+def cli(args):
+    print(forecast_for_current_timestamp(current_timestamp=args.forecast_epoch_timestamp))
