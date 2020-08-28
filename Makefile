@@ -15,11 +15,16 @@ RAW_DATA_CSV = lunations.csv.gz
 LIBRARY_DATA_JSON = lunations.json.gz
 
 
+.PHONY: forecast
 forecast: run
 	@docker exec \
 		$(DOCKER_TAG) \
 		/code/venv/bin/python -m $(MODULE_NAME) forecast \
 		$(FORECAST_CLI_ARGS)
+
+
+.PHONY: retrain
+retrain: ./dat/$(LIBRARY_DATA_JSON)
 
 
 ./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV) run
@@ -55,6 +60,7 @@ build: Dockerfile requirements-minimal.txt $(shell find $(DOCKER_TAG) -type f)
 		--build-arg=GIT_SHA=$(GIT_SHA) \
 		--tag $(DOCKER_TAG) \
 		.
+
 
 .PHONY: stop
 stop:
