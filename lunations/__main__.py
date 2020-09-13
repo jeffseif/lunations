@@ -1,9 +1,11 @@
 import argparse
 import datetime
 
-from lunations import DEFAULT_HARMONIC_PEAKS
 from lunations import forecaster
 from lunations import modeler
+
+
+DEFAULT_HARMONIC_PEAKS = 2
 
 
 def main():

@@ -56,13 +56,13 @@ The model is fitted on 3966 historical lunations from `1700-01-20` through `2020
 
 ## How does the library work?
 
-### Using it as a python package
+### Forecasting as a python package
 
-1. Install the package: `pip install git://github.com/jeffseif/lunations.git#egg=lunations`
-1. Import it: `import lunations.forecaster`
-1. Run it `lunations.forecaster.forecast_for_current_timestamp()`
+1. Install the package: `pip install -e git://github.com/jeffseif/lunations.git#egg=lunations`
+1. Import it: `import lunations`
+1. Run it `lunations.forecast_for_current_timestamp()`
 
-### Doing one-shot forecasting
+### Forecasting from the command-line
 
 ```bash
 > make forecast

@@ -1,8 +1,8 @@
 import gzip
 import json
 
-from lunations import MAX_LUNATION
-from lunations import MIN_LUNATION
+MAX_LUNATION = 102657
+MIN_LUNATION = -21014
 
 
 def generate(args, model):

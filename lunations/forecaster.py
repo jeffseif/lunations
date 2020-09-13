@@ -5,8 +5,9 @@ import enum
 import gzip
 import json
 import math
+import pkg_resources
 
-from lunations import PATH_TO_LUNATIONS_DATA_JSON
+PATH_TO_LUNATIONS_DATA_JSON = pkg_resources.resource_filename(__name__, '../dat/lunations.json.gz')
 
 
 class LunarPhase(int, enum.Enum):

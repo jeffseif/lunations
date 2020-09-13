@@ -2,3 +2,6 @@
 moon-data-master.zip
 lunations.csv.gz
 venv/
+__pycache__/
+.eggs/
+*.egg-info
