@@ -1,4 +1,4 @@
-Copyright (c) 2020-2020, the lunatinos Development Team
+Copyright (c) 2020-2020, the lunations Development Team
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
