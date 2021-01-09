@@ -121,9 +121,9 @@ class Forecast:
                 return previous_phase
 
 
-def forecast_for_current_timestamp(
-    current_timestamp=datetime.datetime.now().timestamp()
-):
+def forecast_for_current_timestamp(current_timestamp=None):
+    if current_timestamp is None:
+        current_timestamp = datetime.datetime.now().timestamp()
     return dataclasses.asdict(Forecast.from_path_to_json(
         current_timestamp=current_timestamp,
         path_to_json=PATH_TO_LUNATIONS_DATA_JSON,
