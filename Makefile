@@ -3,9 +3,6 @@ MODULE_NAME = $(notdir $(shell pwd))
 DOCKER_TAG = $(MODULE_NAME)
 GIT_SHA=$(shell git rev-parse HEAD)
 
-ifndef VERBOSE
-	DOCKER_BUILD_ARGS=--quiet
-endif
 ifdef FORECAST_EPOCH_TIMESTAMP
 	FORECAST_CLI_ARGS=--forecast-epoch-timestamp=$(FORECAST_EPOCH_TIMESTAMP)
 endif
@@ -16,8 +13,8 @@ LIBRARY_DATA_JSON = lunations.json.gz
 
 
 .PHONY: forecast
-forecast: run
-	@docker exec \
+forecast: up
+	@docker compose exec \
 		$(DOCKER_TAG) \
 		/code/venv/bin/python -m $(MODULE_NAME) forecast \
 		$(FORECAST_CLI_ARGS)
@@ -27,51 +24,28 @@ forecast: run
 retrain: ./dat/$(LIBRARY_DATA_JSON)
 
 
-./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV) run
-	@docker cp \
+./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV) up
+	@docker compose cp \
 		$< \
 		$(DOCKER_TAG):/code/
-	@docker exec \
+	@docker compose exec \
 		$(DOCKER_TAG) \
 		/code/venv/bin/python -m $(MODULE_NAME) model \
 		--path-to-csv-input=/code/$< \
 		--path-to-json-output=/code/$(LIBRARY_DATA_JSON)
-	@docker cp \
+	@docker compose cp \
 		$(DOCKER_TAG):/code/$(LIBRARY_DATA_JSON) \
 		$@
 
 
-.PHONY: run
-run: build stop
-	# Run a fresh container
-	@docker run \
-		--detach \
-		--interactive \
-		--name=$(DOCKER_TAG) \
-		--tty \
-		$(DOCKER_TAG)
+.PHONY: up
+up: Dockerfile requirements-minimal.txt $(shell find $(DOCKER_TAG) -type f)
+	@docker compose run --detach $(DOCKER_TAG)
 
 
-.PHONY: build
-build: Dockerfile requirements-minimal.txt $(shell find $(DOCKER_TAG) -type f)
-	# Build a fresh image
-	@docker build \
-		$(DOCKER_BUILD_ARGS) \
-		--build-arg=GIT_SHA=$(GIT_SHA) \
-		--tag $(DOCKER_TAG) \
-		.
-
-
-.PHONY: stop
-stop:
-	# Stop and remove container
-	@docker container stop \
-		--time=1 \
-		$(DOCKER_TAG) \
-		2>&1 > /dev/null || true
-	@docker container rm \
-		$(DOCKER_TAG) \
-		2>&1 > /dev/null || true
+.PHONY: down
+down:
+	@docker compose down
 
 
 .INTERMEDIATE: $(RAW_DATA_CSV)
