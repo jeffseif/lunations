@@ -18,6 +18,7 @@ forecast: up
 		$(DOCKER_TAG) \
 		/code/venv/bin/python -m $(MODULE_NAME) forecast \
 		$(FORECAST_CLI_ARGS)
+	@docker compose down
 
 
 .PHONY: retrain
@@ -36,16 +37,12 @@ retrain: ./dat/$(LIBRARY_DATA_JSON)
 	@docker compose cp \
 		$(DOCKER_TAG):/code/$(LIBRARY_DATA_JSON) \
 		$@
+	@docker compose down
 
 
 .PHONY: up
 up: Dockerfile requirements-minimal.txt $(shell find $(DOCKER_TAG) -type f)
 	@docker compose run --detach $(DOCKER_TAG)
-
-
-.PHONY: down
-down:
-	@docker compose down
 
 
 .INTERMEDIATE: $(RAW_DATA_CSV)
