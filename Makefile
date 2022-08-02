@@ -13,7 +13,8 @@ LIBRARY_DATA_JSON = lunations.json.gz
 
 
 .PHONY: forecast
-forecast: up
+forecast:
+	@docker compose up --detach
 	@docker compose exec \
 		$(DOCKER_TAG) \
 		/code/venv/bin/python -m $(MODULE_NAME) forecast \
@@ -25,7 +26,8 @@ forecast: up
 retrain: ./dat/$(LIBRARY_DATA_JSON)
 
 
-./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV) up
+./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV)
+	@docker compose up --detach
 	@docker compose cp \
 		$< \
 		$(DOCKER_TAG):/code/
@@ -38,11 +40,6 @@ retrain: ./dat/$(LIBRARY_DATA_JSON)
 		$(DOCKER_TAG):/code/$(LIBRARY_DATA_JSON) \
 		$@
 	@docker compose down
-
-
-.PHONY: up
-up: Dockerfile requirements-minimal.txt $(shell find $(DOCKER_TAG) -type f)
-	@docker compose run --detach $(DOCKER_TAG)
 
 
 .INTERMEDIATE: $(RAW_DATA_CSV)
