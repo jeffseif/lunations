@@ -1,51 +1,24 @@
-# OS
+FROM ubuntu:jammy
 
-FROM    ubuntu:focal
-RUN     apt-get update \
-&&      apt-get upgrade \
-            --yes \
-&&      ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime \
-        ;
-
-# System dependencies
-
-RUN     apt-get install \
-            --no-install-recommends \
-            --yes \
-            dumb-init \
-            python3 \
-            python3-numpy \
-            python3-pip \
-            python3-scipy \
-            python3-setuptools \
-            virtualenv \
-        ;
-
-# Python packages
-
-RUN     virtualenv \
-            --python=$(which python3) \
-            /code/venv \
-&&      /code/venv/bin/pip install \
-            --upgrade pip \
-        ;
-COPY    requirements-minimal.txt /code/
-RUN     /code/venv/bin/pip install \
-            --requirement /code/requirements-minimal.txt \
-        ;
-
-# Bust any downstream caches upon new commits
-
-ARG     GIT_SHA
-ENV     GIT_SHA=${GIT_SHA}
-
-# Code
+RUN : \
+    && apt-get update --yes --fix-missing \
+    && apt-get install --yes \
+        python3 \
+        python3-numpy \
+        python3-pip \
+        python3-scipy \
+        python3-venv \
+    && ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime \
+    && rm -rf /var/lib/apt/lists/* \
+    && :
 
 WORKDIR /code
-COPY    lunations/ lunations/
-COPY    dat/ dat/
 
-# Run
-
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD     ["/bin/bash"]
+COPY lunations lunations
+COPY setup.py .
+RUN : \
+    && python3 -m venv /code/venv \
+    && /code/venv/bin/pip install --upgrade pip \
+    && /code/venv/bin/pip install . \
+    && :
+ENV PATH="/code/venv/bin:${PATH}"

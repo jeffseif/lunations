@@ -1,4 +1,6 @@
 services:
   lunations:
     build: .
-    tty: true
+    volumes:
+      - ./dat:/code/dat
+      - ./:/code/

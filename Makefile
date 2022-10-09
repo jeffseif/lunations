@@ -1,46 +1,27 @@
-.SECONDARY:
-MODULE_NAME = $(notdir $(shell pwd))
-DOCKER_TAG = $(MODULE_NAME)
-GIT_SHA=$(shell git rev-parse HEAD)
+# Python
 
-ifdef FORECAST_EPOCH_TIMESTAMP
-	FORECAST_CLI_ARGS=--forecast-epoch-timestamp=$(FORECAST_EPOCH_TIMESTAMP)
-endif
+PYTHON = $(shell which python3)
+SHELL = /bin/bash
+VENV_DIR = venv
+
+.PHONY: lint
+lint:
+	@$(PYTHON) -m venv $(VENV_DIR)
+	@$(VENV_DIR)/bin/pip install --quiet --upgrade pip
+	@$(VENV_DIR)/bin/pip install --quiet pre-commit
+	@$(VENV_DIR)/bin/pre-commit install
+	@$(VENV_DIR)/bin/pre-commit run --all-files
+
+.PHONY: clean
+clean:
+	@git clean -fdfx
+
+# Data
+
+.SECONDARY:
 
 UPSTREAM_REPO_ZIP = moon-data-master.zip
 RAW_DATA_CSV = lunations.csv.gz
-LIBRARY_DATA_JSON = lunations.json.gz
-
-
-.PHONY: forecast
-forecast:
-	@docker compose up --detach
-	@docker compose exec \
-		$(DOCKER_TAG) \
-		/code/venv/bin/python -m $(MODULE_NAME) forecast \
-		$(FORECAST_CLI_ARGS)
-	@docker compose down
-
-
-.PHONY: retrain
-retrain: ./dat/$(LIBRARY_DATA_JSON)
-
-
-./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV)
-	@docker compose up --detach
-	@docker compose cp \
-		$< \
-		$(DOCKER_TAG):/code/
-	@docker compose exec \
-		$(DOCKER_TAG) \
-		/code/venv/bin/python -m $(MODULE_NAME) model \
-		--path-to-csv-input=/code/$< \
-		--path-to-json-output=/code/$(LIBRARY_DATA_JSON)
-	@docker compose cp \
-		$(DOCKER_TAG):/code/$(LIBRARY_DATA_JSON) \
-		$@
-	@docker compose down
-
 
 .INTERMEDIATE: $(RAW_DATA_CSV)
 $(RAW_DATA_CSV): $(UPSTREAM_REPO_ZIP)
@@ -54,7 +35,6 @@ $(RAW_DATA_CSV): $(UPSTREAM_REPO_ZIP)
 		| gzip \
 		>> $@
 
-
 .INTERMEDIATE: $(UPSTREAM_REPO_ZIP)
 $(UPSTREAM_REPO_ZIP):
 	@curl \
@@ -62,3 +42,34 @@ $(UPSTREAM_REPO_ZIP):
 		--output $@ \
 		--remote-name \
 		https://github.com/CraigChamberlain/moon-data/archive/master.zip
+
+# Docker
+
+MODULE_NAME = $(notdir $(shell pwd))
+DOCKER_TAG = $(MODULE_NAME)
+
+ifdef FORECAST_EPOCH_TIMESTAMP
+	FORECAST_CLI_ARGS=--forecast-epoch-timestamp=$(FORECAST_EPOCH_TIMESTAMP)
+endif
+
+LIBRARY_DATA_JSON = lunations.json.gz
+
+.PHONY: forecast
+forecast:
+	@$(MAKE) build
+	@docker compose run --rm $(DOCKER_TAG) \
+		python -m $(MODULE_NAME) forecast \
+			$(FORECAST_CLI_ARGS)
+
+.PHONY: retrain
+retrain: ./dat/$(LIBRARY_DATA_JSON)
+
+./dat/$(LIBRARY_DATA_JSON): $(RAW_DATA_CSV)
+	@$(MAKE) build
+	@docker compose run --rm $(DOCKER_TAG) \
+		python -m $(MODULE_NAME) model \
+			--path-to-csv-input=/code/$< \
+			--path-to-json-output=/code/dat/$(LIBRARY_DATA_JSON)
+
+build:
+	@docker compose build --pull

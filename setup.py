@@ -1,22 +1,25 @@
 from setuptools import setup
 
-from lunations import __author__
-from lunations import __email__
-from lunations import __program__
-from lunations import __url__
-from lunations import __version__
+
+__author__ = "Jeffrey Seifried"
+__email__ = "jeffrey.seifried@gmail.com"
+__program__ = "lunations"
+__url__ = "http://github.com/jeffseif/{}".format(__program__)
+__version__ = "1.0.0"
 
 
 setup(
     author=__author__,
     author_email=__email__,
-    install_requires=[],
+    install_requires=[
+        "numpy",
+        "pandas",
+        "python-dateutil",
+        "pytz",
+        "scipy",
+    ],
     name=__program__,
     packages=[__program__],
-    platforms='all',
-    setup_requires=[
-        'setuptools',
-    ],
     url=__url__,
     version=__version__,
 )
