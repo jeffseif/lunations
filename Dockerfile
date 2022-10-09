@@ -15,11 +15,11 @@ RUN : \
 WORKDIR /code
 
 COPY lunations lunations
-COPY setup.py .
+COPY requirements-ml-minimal.txt .
 RUN : \
     && python3 -m venv /code/venv \
     && /code/venv/bin/pip install --upgrade pip \
-    && /code/venv/bin/pip install . \
+    && /code/venv/bin/pip install --requirement=requirements-ml-minimal.txt \
     && :
 ENV PATH="/code/venv/bin:${PATH}"
 

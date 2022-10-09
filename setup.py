@@ -11,13 +11,7 @@ __version__ = "1.0.0"
 setup(
     author=__author__,
     author_email=__email__,
-    install_requires=[
-        "numpy",
-        "pandas",
-        "python-dateutil",
-        "pytz",
-        "scipy",
-    ],
+    install_requires=[],
     name=__program__,
     packages=[__program__],
     url=__url__,
