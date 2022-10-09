@@ -22,3 +22,5 @@ RUN : \
     && /code/venv/bin/pip install . \
     && :
 ENV PATH="/code/venv/bin:${PATH}"
+
+COPY lunations.csv.gz .

@@ -40,7 +40,6 @@ $(UPSTREAM_REPO_ZIP):
 	@curl \
 		--location \
 		--output $@ \
-		--remote-name \
 		https://github.com/CraigChamberlain/moon-data/archive/master.zip
 
 # Docker
@@ -71,5 +70,6 @@ retrain: ./dat/$(LIBRARY_DATA_JSON)
 			--path-to-csv-input=/code/$< \
 			--path-to-json-output=/code/dat/$(LIBRARY_DATA_JSON)
 
-build:
+.PHONY: build
+build: $(RAW_DATA_CSV)
 	@docker compose build --pull

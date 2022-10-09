@@ -3,4 +3,3 @@ services:
     build: .
     volumes:
       - ./dat:/code/dat
-      - ./:/code/
