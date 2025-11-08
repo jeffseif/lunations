@@ -3,14 +3,12 @@ import dataclasses
 import datetime
 import enum
 import gzip
+import importlib.resources
 import json
 import math
 
-import pkg_resources
-
-PATH_TO_LUNATIONS_DATA_JSON = pkg_resources.resource_filename(
-    __name__,
-    "../dat/lunations.json.gz",
+PATH_TO_LUNATIONS_DATA_JSON = str(
+    importlib.resources.files(__name__) / "../dat/lunations.json.gz"
 )
 
 
